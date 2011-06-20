@@ -12,6 +12,8 @@ Palermo, rewritten for use with Test::Unit.
 
 # Installation
 
+To get started, `gem install sunspot_matchers_testunit` from the command prompt or add it to your Gemfile.
+
 You will need to replace the Sunspot Session object with the spy provided.  You can do this globally by putting the
 following in a setup block or your test_helper.
 
