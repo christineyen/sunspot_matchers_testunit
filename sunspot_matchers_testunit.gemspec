@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version     = SunspotMatchersTestunit::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Christine Yen"]
-  s.email       = []
+  s.email       = ["cyen@christineyen.com"]
   s.homepage    = "https://github.com/christineyen/sunspot_matchers_testunit"
   s.summary     = "Test::Unit port of RSpec matchers for testing Sunspot"
   s.description = "These matchers allow you to test what is happening inside the Sunspot Search DSL blocks"
