@@ -1,25 +1,27 @@
+require 'test/unit/assertions'
+
 module SunspotMatchersTestunit
   class BaseMatcher
     attr_accessor :args
 
-    def initialize(actual, args)
-      @actual = actual
+    def initialize(session, args)
+      @session = session
       @args = args
       build_comparison_search
     end
 
     def build_comparison_search
       @comparison_search = if(@args.last.is_a?(Proc))
-        SunspotMatchersTestunit::SunspotSessionSpy.new(nil).build_search(search_types, &args.last)
+        SunspotMatchersTestunit::SunspotSessionSpy.new(@session).build_search(search_types, &args.last)
       else
-        SunspotMatchersTestunit::SunspotSessionSpy.new(nil).build_search(search_types) do
+        SunspotMatchersTestunit::SunspotSessionSpy.new(@session).build_search(search_types) do
           send(search_method, *args)
         end
       end
     end
 
     def search_tuple
-      search_tuple = @actual.is_a?(Array) ? @actual : @actual.searches.last
+      search_tuple = @session.is_a?(Array) ? @session : @session.searches.last
       raise 'no search found' unless search_tuple
       search_tuple
     end
@@ -122,27 +124,16 @@ module SunspotMatchersTestunit
   end
 
   class HaveSearchParams
-    def initialize(method, *args)
+    include Test::Unit::Assertions
+
+    def initialize(session, method, *args)
+      @session = session
       @method = method
       @args = args
     end
 
-    def matches?(actual)
-      @actual = actual
-      @matcher = get_matcher.new(@actual, @args)
-      @matcher.match?
-    end
-
-    def failure_message_for_should
-      @matcher.missing_param_error_message
-    end
-
-    def failure_message_for_should_not
-      @matcher.unexpected_match_error_message
-    end
-
     def get_matcher
-      case @method
+      matcher_class = case @method
         when :with
           WithMatcher
         when :without
@@ -158,11 +149,20 @@ module SunspotMatchersTestunit
         when :paginate
           PaginationMatcher
       end
+      matcher_class.new(@session, @args)
     end
   end
 
-  def have_search_params(method, *args)
-    HaveSearchParams.new(method, *args)
+  def assert_has_search_params(session, method_and_args)
+    method, *args = method_and_args
+    matcher = HaveSearchParams.new(session, method, *args).get_matcher
+    assert matcher.match?, matcher.missing_param_error_message
+  end
+
+  def assert_has_no_search_params(session, method_and_args)
+    method, *args = method_and_args
+    matcher = HaveSearchParams.new(session, method, *args).get_matcher
+    assert !matcher.match?, matcher.unexpected_match_error_message
   end
 
   class WithMatcher < BaseMatcher
@@ -273,17 +273,17 @@ module SunspotMatchersTestunit
   end
 
   class BeASearchFor
-    def initialize(expected_class)
+    def initialize(session, expected_class)
+      @session = session
       @expected_class = expected_class
     end
 
-    def matches?(actual)
-      @actual = actual
+    def match?
       search_types.include?(@expected_class)
     end
 
     def search_tuple
-      search_tuple = @actual.is_a?(Array) ? @actual : @actual.searches.last
+      search_tuple = @session.is_a?(Array) ? @session : @session.searches.last
       raise 'no search found' unless search_tuple
       search_tuple
     end
@@ -301,8 +301,14 @@ module SunspotMatchersTestunit
     end
   end
 
-  def be_a_search_for(expected_class)
-    BeASearchFor.new(expected_class)
+  def assert_is_search_for(session, expected_class)
+    matcher = BeASearchFor.new(session, expected_class)
+    assert matcher.match?, matcher.failure_message_for_should
+  end
+
+  def assert_is_not_search_for(session, expected_class)
+    matcher = BeASearchFor.new(session, expected_class)
+    assert !matcher.match?, matcher.failure_message_for_should_not
   end
 end
 
