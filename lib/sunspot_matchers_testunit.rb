@@ -1,0 +1,2 @@
+require 'sunspot_matchers_testunit/matchers'
+require 'sunspot_matchers_testunit/sunspot_session_spy'

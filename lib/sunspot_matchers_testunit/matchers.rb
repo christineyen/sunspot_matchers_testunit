@@ -1,4 +1,4 @@
-module SunspotMatchers
+module SunspotMatchersTestunit
   class BaseMatcher
     attr_accessor :args
 
@@ -10,9 +10,9 @@ module SunspotMatchers
 
     def build_comparison_search
       @comparison_search = if(@args.last.is_a?(Proc))
-        SunspotMatchers::SunspotSessionSpy.new(nil).build_search(search_types, &args.last)
+        SunspotMatchersTestunit::SunspotSessionSpy.new(nil).build_search(search_types, &args.last)
       else
-        SunspotMatchers::SunspotSessionSpy.new(nil).build_search(search_types) do
+        SunspotMatchersTestunit::SunspotSessionSpy.new(nil).build_search(search_types) do
           send(search_method, *args)
         end
       end

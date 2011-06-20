@@ -1,4 +1,4 @@
-module SunspotMatchers
+module SunspotMatchersTestunit
   class SunspotSearchSpy < Sunspot::Search::StandardSearch
     def execute
       self
