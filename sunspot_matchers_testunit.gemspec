@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
 
   s.add_development_dependency "bundler", ">= 1.0.0"
-  s.add_development_dependency "rspec", "~> 2.4.0"
   s.add_development_dependency "sunspot", "~> 1.2.1"
   s.add_development_dependency "rake"
 
