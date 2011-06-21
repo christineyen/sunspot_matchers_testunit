@@ -72,10 +72,10 @@ keywords, with, without, and order_by support wildcard expectations using the `a
       order_by :blog_id, :desc
     end
 
-    assert_has_search_params Sunspot.session, [ :with, :blog_id, any_param ]
-    assert_has_search_params Sunspot.session, [ :order_by, :blog_id, any_param ]
-    assert_has_search_params Sunspot.session, [ :order_by, any_param ]
-    assert_has_no_search_params Sunspot.session, [ :order_by, :category_ids, any_param ]
+    assert_has_search_params Sunspot.session, :with, :blog_id, any_param
+    assert_has_search_params Sunspot.session, :order_by, :blog_id, any_param
+    assert_has_search_params Sunspot.session, :order_by, any_param
+    assert_has_no_search_params Sunspot.session, :order_by, :category_ids, any_param
 
 ### :keywords
 
@@ -85,7 +85,7 @@ You can match against a keyword search:
       keywords 'great pizza'
     end
 
-    assert_has_search_params Sunspot.session, [ :keywords, 'great pizza' ]
+    assert_has_search_params Sunspot.session, :keywords, 'great pizza'
 
 ### :with
 
@@ -95,7 +95,7 @@ You can match against a with restriction:
       with :author_name, 'Mark Twain'
     end
 
-    assert_has_search_params Sunspot.session, [ :with, :author_name, 'Mark Twain' ]
+    assert_has_search_params Sunspot.session, :with, :author_name, 'Mark Twain'
 
 Complex conditions can be matched by using a Proc instead of a value.  Be aware that order does matter, not for
 the actual results that would come out of Solr, but the matcher will fail of the order of `with` restrictions is
@@ -108,12 +108,12 @@ different.
       end
     end
 
-    assert_has_search_params Sunspot.session, [ :with, Proc.new {
+    assert_has_search_params Sunspot.session, :with, Proc.new {
       any_of do
         with :category_ids, 1
         with :category_ids, 2
       end
-    } ]
+    }
 
 ### :without
 
@@ -123,7 +123,7 @@ Without is nearly identical to with:
       without :author_name, 'Mark Twain'
     end
 
-    assert_has_search_params Sunspot.session, [ :without, :author_name, 'Mark Twain' ]
+    assert_has_search_params Sunspot.session, :without, :author_name, 'Mark Twain'
 
 ### :paginate
 
@@ -133,7 +133,7 @@ You can also specify only page or per_page, both are not required.
       paginate :page => 3, :per_page => 15
     end
 
-    assert_has_search_params Sunspot.session, [ :paginate, :page => 3, :per_page => 15 ]
+    assert_has_search_params Sunspot.session, :paginate, :page => 3, :per_page => 15
 
 ### :order_by
 
@@ -143,7 +143,7 @@ Expectations on multiple orderings are supported using using the Proc format men
       order_by :published_at, :desc
     end
 
-    assert_has_search_params Sunspot.session, [ :order_by, :published_at, :desc ]
+    assert_has_search_params Sunspot.session, :order_by, :published_at, :desc
 
 ### :facet
 
@@ -153,7 +153,7 @@ Standard faceting expectation:
       facet :category_ids
     end
 
-    assert_has_search_params Sunspot.session, [ :facet, :category_ids ]
+    assert_has_search_params Sunspot.session, :facet, :category_ids
 
 Faceting where a query is excluded:
 
@@ -162,10 +162,10 @@ Faceting where a query is excluded:
       facet(:category_ids, :exclude => category_filter)
     end
 
-    assert_has_search_params Sunspot.session, [ :facet, Proc.new {
+    assert_has_search_params Sunspot.session, :facet, Proc.new {
       category_filter = with(:category_ids, 2)
       facet(:category_ids, :exclude => category_filter)
-    } ]
+    }
 
 Query faceting:
 
@@ -180,7 +180,7 @@ Query faceting:
       end
     end
     
-    assert_has_search_params Sunspot.session, [ :facet, Proc.new {
+    assert_has_search_params Sunspot.session, :facet, Proc.new {
       facet(:average_rating) do
         row(1.0..2.0) do
           with(:average_rating, 1.0..2.0)
@@ -189,7 +189,7 @@ Query faceting:
           with(:average_rating, 2.0..3.0)
         end
       end
-    } ]
+    }
 
 ### :boost
 
@@ -201,11 +201,11 @@ Field boost matching:
       end
     end
 
-    assert_has_search_params Sunspot.session, [ :boost, Proc.new {
+    assert_has_search_params Sunspot.session, :boost, Proc.new {
       keywords 'great pizza' do
         boost_fields :body => 2.0
       end
-    } ]
+    }
 
 Boost query matching:
 
@@ -217,13 +217,13 @@ Boost query matching:
       end
     end
 
-    assert_has_search_params Sunspot.session, [ :boost, Proc.new {
+    assert_has_search_params Sunspot.session, :boost, Proc.new {
       keywords 'great pizza' do
         boost(2.0) do
           with :blog_id, 4
         end
       end
-    } ]
+    }
 
 Boost function matching:
 
@@ -233,8 +233,8 @@ Boost function matching:
       end
     end
 
-    assert_has_search_params Sunspot.session, [ :boost, Proc.new {
+    assert_has_search_params Sunspot.session, :boost, Proc.new {
       keywords 'great pizza' do
         boost(function { sum(:average_rating, product(:popularity, 10)) })
       end
-    } ]
+    }
