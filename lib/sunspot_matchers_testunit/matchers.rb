@@ -153,13 +153,13 @@ module SunspotMatchersTestunit
     end
   end
 
-  def assert_has_search_params(session, method_and_args)
+  def assert_has_search_params(session, *method_and_args)
     method, *args = method_and_args
     matcher = HaveSearchParams.new(session, method, *args).get_matcher
     assert matcher.match?, matcher.missing_param_error_message
   end
 
-  def assert_has_no_search_params(session, method_and_args)
+  def assert_has_no_search_params(session, *method_and_args)
     method, *args = method_and_args
     matcher = HaveSearchParams.new(session, method, *args).get_matcher
     assert !matcher.match?, matcher.unexpected_match_error_message
